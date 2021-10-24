@@ -1,6 +1,4 @@
-from gpiozero import AnalogInputDevice
-from adc083x import ADC083x
-from adc083x import ADC0834
+from gpiozero import MCP3008
 from decode import decode
 # from lifi import receive
 from time import sleep
@@ -42,7 +40,7 @@ class LiFiReceiver:
 
 
 if __name__ == '__main__':
-    adc = ADC0834(0, max_voltage=3.3)
+    adc = MCP3008(0)
     receiver = LiFiReceiver(adc)
     receiver.calibrate2()
     bits = []
