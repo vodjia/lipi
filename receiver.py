@@ -1,11 +1,16 @@
 import serial
-import numpy as np
 
 class LiFiReceiver:
     """A Li-Fi receiver"""
     port = serial.Serial('/dev/ttyACM0')
-    packet_capacity = 512
+    packet_capacity = 256
+    bits_per_packet = 16
     period = 9
+    high_threshold = 50
+    low_threshold = 30
+    start_pattern = '11000'
+    end_pattern = '0110101101'
+    halt_pattern = '0010000100'
 
     def listen_packet(self):
         packet = []
@@ -16,38 +21,26 @@ class LiFiReceiver:
         return packet
 
     def process_packet(self, packet):
-        packet_upper = np.percentile(packet, 90)
-        packet_lower = np.percentile(packet, 10)
-        packet_range = packet_upper - packet_lower
-        packet_middle = packet_range / 2
-        high_threshold = packet_middle + 0.4 * packet_range
-        low_threshold = packet_middle - 0.4 * packet_range
         for i in range(len(packet)):
-            if packet[i] < low_threshold:
+            if packet[i] < self.low_threshold:
                 packet[i] = 0
-            elif packet[i] > high_threshold:
+            elif packet[i] > self.high_threshold:
                 packet[i] = 1
             else:
                 packet[i] = 0
-
-    def listen_raw(self):
-        raw_data = []
-        while True:
-            packet = self.listen_packet()
-            self.process_packet(packet)
-            raw_data.append(packet)
-
-            if packet.count(0) == len(packet):
-                break
-        return raw_data
-
-    def process_raw(self, raw_data):
-        raw_data = ''.join(str(i) for i in raw_data)
-        start = raw_data.find('111111111111111111000000000000000000000000000')
         data = ''
-        for i in range(start + int(self.period / 2), len(raw_data), self.period):
-            data += raw_data[i]
-        return data[5:data.find('00000')]
+        for i in range(int(self.period / 2), len(packet), self.period):
+            data += str(packet[i])
+        begin = data.find(self.start_pattern) + len(self.start_pattern)
+        end = begin + self.bits_per_packet
+        return data[begin:end]
 
     def listen(self):
-        return self.process_raw(self.listen_raw())
+        data = ''
+        while True:
+            bits = self.process_packet(self.listen_packet())
+            print(bits)
+            data += bits
+            if bits.find(self.halt_pattern) != -1:
+                break
+        return data[:data.rfind(self.end_pattern)]
