@@ -1,27 +1,33 @@
+import binascii
 import sys
 
-
-def decode(argv):
-    manchester_bits = argv # .strip('][').split(', ')
-    print('manchester bits len = ' + str(len(manchester_bits)) + '\n')
-    print('manchester bits = ' + str(manchester_bits) + '\n')
-    print('===============================================')
-    bits = ''
-    result = ''
-    for i in range(0, len(manchester_bits), 2):
-        if manchester_bits[i] == '1' and manchester_bits[i+1] == '0':
-            bits += '1'
-        elif manchester_bits[i] == '0' and manchester_bits[i+1] == '1':
-            bits += '0'
-        else:
-            sys.stderr.write('bit error detected ')
-            sys.stderr.write('i = ' + str(i))
-            sys.exit(1)
-    for i in range(0, len(bits), 8):
-        result += chr(int(bits[i:i+8], 2))
-    print(result)
-    # sys.stdout.write()
-
+def decode4b5b(bits, save_path):
+    file_data = bits[bits.find("11000")+5:-1]
+    decode_dict = {
+        "11110":"0",
+        "01001":"1",
+        "10100":"2",
+        "10101":"3",
+        "01010":"4",
+        "01011":"5",
+        "01110":"6",
+        "01111":"7",
+        "10010":"8",
+        "10011":"9",
+        "10110":"a",
+        "10111":"b",
+        "11010":"c",
+        "11011":"d",
+        "11100":"e",
+        "11101":"f"
+    }
+    n = 0
+    hex_str = ""
+    while n < len(file_data) - 4:
+        hex_str += decode_dict[file_data[n:n+5]]
+    data = binascii.unhexlify(hex_str.endcode("ASCII"))
+    with open(save_path, 'wb') as file:
+        file.write(data)
 
 if __name__ == '__main__':
     if len(sys.argv) <= 1:
