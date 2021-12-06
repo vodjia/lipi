@@ -24,6 +24,9 @@ def decode4b5b(bits, save_path):
     n = 0
     hex_str = ""
     while n < len(file_data) - 4:
+        byte = decode_dict[file_data[n:n+5]]
+        if not byte:
+            print("Error in translation")
         hex_str += decode_dict[file_data[n:n+5]]
     data = binascii.unhexlify(hex_str.endcode("ASCII"))
     with open(save_path, 'wb') as file:
