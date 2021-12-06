@@ -21,7 +21,7 @@ void setup() {
 
 void loop() {
   if (packetSize == 0) {
-    while (analogRead(photodiode) < high_threshold)
+    while (analogRead(photodiode) > low_threshold)
       continue;
   }
   packet[packetSize++] = analogRead(photodiode);

@@ -8,7 +8,7 @@ class LiFiReceiver:
     period = 9
     high_threshold = 50
     low_threshold = 30
-    start_pattern = '11000'
+    start_pattern = '00110'
     end_pattern = '0110101101'
     halt_pattern = '0010000100'
 
