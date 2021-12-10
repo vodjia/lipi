@@ -1,6 +1,5 @@
 import sys
 
-
 def encode(argv):
     text = argv
     if len(text) >= 64 :

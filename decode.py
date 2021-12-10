@@ -1,7 +1,7 @@
 import binascii
 import sys
 
-def decode4b5b(bits, save_path):
+def decode4b5b(bits):
     file_data = bits
     decode_dict = {
         "11110":"0",
@@ -28,13 +28,11 @@ def decode4b5b(bits, save_path):
         try:
             byte = decode_dict[file_data[n:n+5]]
         except:
-            print(hex_str.encode("ASCII"))
-            return
+            byte = "0"
         hex_str += byte
         n += 5
     data = binascii.unhexlify(hex_str.encode("ASCII"))
-    with open(save_path, 'wb') as file:
-        file.write(data)
+    return data
 
 if __name__ == '__main__':
     if len(sys.argv) <= 1:

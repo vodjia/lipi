@@ -1,18 +1,16 @@
-import serial
+class Receiver:
+    def __init__(self, port, packet_capacity=256, bits_per_packet=16,
+                 period=9, start_pattern='00110', end_pattern='01101',
+                 halt_pattern='00100'):
+        self.port = port
+        self.packet_capacity = packet_capacity
+        self.bits_per_packet = bits_per_packet
+        self.period = period
+        self.start_pattern = start_pattern
+        self.end_pattern = end_pattern
+        self.halt_pattern = halt_pattern
 
-class LiFiReceiver:
-    """A Li-Fi receiver"""
-    port = serial.Serial('/dev/ttyACM0')
-    packet_capacity = 256
-    bits_per_packet = 16
-    period = 9
-    high_threshold = 50
-    low_threshold = 30
-    start_pattern = '00110'
-    end_pattern = '0110101101'
-    halt_pattern = '0010000100'
-
-    def listen_packet(self):
+    def listen_raw_packet(self):
         packet = []
         if self.port.is_open:
             for _ in range(self.packet_capacity):
@@ -20,16 +18,10 @@ class LiFiReceiver:
                 packet.append(int.from_bytes(signal, "little"))
         return packet
 
-    def process_packet(self, packet):
-        for i in range(len(packet)):
-            if packet[i] < self.low_threshold:
-                packet[i] = 0
-            elif packet[i] > self.high_threshold:
-                packet[i] = 1
-            else:
-                packet[i] = 0
+    def process_raw_packet(self, packet):
         data = ''
-        for i in range(int(self.period / 2), len(packet), self.period):
+        start = int(0.75 * self.period)
+        for i in range(start, len(packet), self.period):
             data += str(packet[i])
         begin = data.find(self.start_pattern) + len(self.start_pattern)
         end = begin + self.bits_per_packet
@@ -38,9 +30,9 @@ class LiFiReceiver:
     def listen(self):
         data = ''
         while True:
-            bits = self.process_packet(self.listen_packet())
-            print(bits)
-            data += bits
-            if bits.find(self.halt_pattern) != -1:
+            packet = self.process_raw_packet(self.listen_raw_packet())
+            print(packet)
+            data += packet
+            if packet[: len(self.halt_pattern)] == self.halt_pattern:
                 break
-        return data[:data.rfind(self.end_pattern)]
+        return data[: data.rfind(self.end_pattern)]
