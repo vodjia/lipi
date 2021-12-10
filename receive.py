@@ -1,19 +1,34 @@
-import serial
 from decode import decode4b5b
-from receiver import Receiver
+from adc0820 import ADC0820
+import time
 
-receiver = Receiver(serial.Serial('COM5'))
-count = 0
-num_errors = 0
+period = 1000000
+ns_in_s = 1000000000
+
+upper = 120
+
+receiver = ADC0820(
+    db0=17, db1=27, db2=22, db3=23,
+    db4=24, db5=25, db6=5, db7=6,
+    rd_n=18, int_n=19, cs_n=20, ofl_n=21,
+    wr_n=16, mode=26
+)
+
+listening = False
+packet = ''
 
 while True:
-    raw_data = receiver.listen()
-    print(raw_data)
-    data = decode4b5b(raw_data)
-    print(data)
-    if data != b'Hello World!':
-        num_errors += 1
-    count += 1
-    print('count: ' + str(count))
-    print('errors: ' + str(num_errors))
-    print('error rate: ' + str(num_errors / count))
+    time.sleep((period - time.time_ns() % period) / ns_in_s)
+    raw = receiver.read()
+    if raw >= upper:
+        bit = '1'
+    else:
+        bit = '0'
+    if bit == '1' and len(packet) == 0:
+        listening = True
+    if listening:
+        packet += bit
+    if len(packet) % 5 == 0 and packet[-5:-1] == '01101':
+        listening = False
+        print(packet)
+        break
