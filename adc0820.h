@@ -40,3 +40,10 @@ struct adc0820_device {
 	struct gpiod_line *db7;
 	struct gpiod_line *ofl_n;
 };
+
+struct adc0820_device *adc0820_new(struct gpiod_chip *chip,
+				   struct adc0820_pinout *pinout);
+
+void adc0820_delete(struct adc0820_device *device);
+
+unsigned char adc0820_read(struct adc0820_device *device);
