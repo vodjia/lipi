@@ -1,4 +1,5 @@
 #include "adc0820.h"
+#include <stdlib.h>
 
 struct adc0820_device *adc0820_new(struct gpiod_chip *chip,
 				   struct adc0820_pinout *pinout)
