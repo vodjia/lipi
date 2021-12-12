@@ -17,6 +17,8 @@ void lipi_transmitter_delete(struct lipi_transmitter *transmitter);
 
 void lipi_transmit_bit(struct lipi_transmitter *transmitter, char bit);
 
-void lipi_transmit(struct lipi_transmitter *transmitter, char *str);
+void lipi_transmit(struct lipi_transmitter *transmitter,
+		   char *str,
+		   size_t count);
 
 #endif

@@ -39,18 +39,16 @@ int main(int argc, char *argv[])
 		size_t file_length = ftell(file);
 		fseek(file, 0, SEEK_SET);
 		size_t message_length = file_length;
-		char *message = malloc(message_length + 1);
+		char *message = malloc(message_length);
 		fread(message, file_length, 1, file);
 		fclose(file);
-		message[message_length] = '\0';
 		size_t encoded_length = 2 * message_length + 2;
-		char *encoded = malloc(encoded_length + 1);
-		encode4b5b(encoded + 1, message);
+		char *encoded = malloc(encoded_length);
+		encode4b5b(encoded + 1, message, message_length);
 		free(message);
 		encoded[0] = start_code;
 		encoded[encoded_length - 1] = end_code;
-		encoded[encoded_length] = '\0';
-		lipi_transmit(transmitter, encoded);
+		lipi_transmit(transmitter, encoded, encoded_length);
 		free(encoded);
 	}
 	lipi_transmitter_delete(transmitter);
