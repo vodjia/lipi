@@ -19,7 +19,7 @@ int main(void)
 	const unsigned long period = 1000;
 	const unsigned long threshold = 120;
 	const size_t code_length = 5;
-	const char start_code = 0x18;
+	const char start_code = 0x06;
 	const char end_code = 0x0D;
 	struct lipi_config config = {
 		.period = period,
@@ -32,7 +32,7 @@ int main(void)
 		lipi_receiver_new(&config, device, adc0820_read);
 	for (;;) {
 		char code = lipi_receive_bit(receiver);
-		if (code == 1) {
+		if (code == start_code >> (code_length - 1)) {
 			code <<= code_length - 1;
 			code |= lipi_receive_bits(receiver, code_length - 1);
 			if (code == start_code) {
