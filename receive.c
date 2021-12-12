@@ -41,16 +41,17 @@ int main(void)
 					lipi_receive(receiver,
 						     raw,
 						     BUFFER_CAPACITY);
-				printf("Raw: [");
-				for (size_t i = 0; i < length; ++i)
-					printf("%x, ", raw[i]);
-				printf("]\n");
+				// printf("Raw: [");
+				// for (size_t i = 0; i < length; ++i)
+				// 	printf("%x, ", raw[i]);
+				// printf("]\n");
 				char data[BUFFER_CAPACITY] = { 0 };
 				int ret = decode4b5b(data, raw);
-				if (ret < 0)
-					printf("Error at index: %d\n", -ret);
-				else
-					printf("Data: %s\n", data);
+				printf("%s\n", data);
+				// if (ret < 0)
+				// 	printf("Error at index: %d\n", -ret);
+				// else
+				// 	printf("Data: %s\n", data);
 				FILE *file = fopen("received.txt", "w");
 				if (fputs(data, file) == EOF) {
 					perror("Failed to write.");
