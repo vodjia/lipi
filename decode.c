@@ -1,0 +1,37 @@
+#include "decode.h"
+#include <limits.h>
+#include <stddef.h>
+
+int decode4b5b(char *dest, const char *src)
+{
+	static char lookup[CHAR_MAX] = {
+		[0x1E] = 0x0,
+		[0x09] = 0x1,
+		[0x14] = 0x2,
+		[0x15] = 0x3,
+		[0x0A] = 0x4,
+		[0x0B] = 0x5,
+		[0x0E] = 0x6,
+		[0x0F] = 0x7,
+		[0x12] = 0x8,
+		[0x13] = 0x9,
+		[0x16] = 0xA,
+		[0x17] = 0xB,
+		[0x1A] = 0xC,
+		[0x1B] = 0xD,
+		[0x1C] = 0xE,
+		[0x1D] = 0xF
+	};
+	size_t i = 0;
+	while (src[i] != '\0') {
+		char data = lookup[(unsigned)src[i]];
+		if (i & 1)
+			dest[i / 2] |= data;
+		else
+			dest[i / 2] = data << CHAR_BIT / 2;
+		if (data == 0x0 && src[i] != 0x1E)
+			return -i;
+		++i;
+	}
+	return i;
+}

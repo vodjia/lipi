@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "adc0820.h"
 #include "receiver.h"
+#include "decode.h"
 
 #define BUFFER_CAPACITY 8192
 
@@ -15,11 +16,11 @@ int main(void)
 		.db4 = 24, .db5 = 25, .db6 = 5, .db7 = 6, .ofl_n = 21
 	};
 	struct adc0820_device *device = adc0820_new(chip, &pinout);
-	const unsigned long period = 1000;
+	const unsigned long period = 10000;
 	const unsigned long threshold = 140;
 	const size_t code_length = 5;
 	const char start_code = 0x18;
-	const char end_code = 0x0d;
+	const char end_code = 0x0D;
 	struct lifi_receiver *receiver = lifi_receiver_new(device,
 							   adc0820_read,
 							   period,
@@ -27,7 +28,8 @@ int main(void)
 							   code_length,
 							   start_code,
 							   end_code);
-	char buffer[BUFFER_CAPACITY] = { 0 };
+	char raw[BUFFER_CAPACITY] = { 0 };
+	char data[BUFFER_CAPACITY] = { 0 };
 	for (;;) {
 		char code = lifi_receive_bit(receiver);
 		if (code == 1) {
@@ -36,12 +38,17 @@ int main(void)
 			if (code == receiver->start_code) {
 				size_t length = 
 					lifi_receive(receiver,
-						     buffer,
+						     raw,
 						     BUFFER_CAPACITY);
-				putchar('[');
+				printf("Raw: [");
 				for (size_t i = 0; i < length; ++i)
-					printf("%x, ", buffer[i]);
+					printf("%x, ", raw[i]);
 				printf("]\n");
+				int d = decode4b5b(data, raw);
+				if (d < 0)
+					printf("Error at index: %d\n", d);
+				else
+					printf("Data: %s\n", data);
 			}
 		}
 	}
