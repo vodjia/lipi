@@ -1,27 +1,20 @@
+#include "config.h"
 #include <stddef.h>
 
-struct lifi_receiver {
+struct lipi_receiver {
+	struct lipi_config *config;
 	void *device;
 	unsigned char (*read)(void *);
-	unsigned long period;
-	unsigned long threshold;
-	size_t code_length;
-	char start_code;
-	char end_code;
 };
 
-struct lifi_receiver *lifi_receiver_new(void *device,
-					void *read,
-					unsigned long period,
-					unsigned long threshold,
-					size_t code_length,
-					char start_code,
-					char end_code);
+struct lipi_receiver *lipi_receiver_new(struct lipi_config *config,
+					void *device,
+					void *read);
 
-void lifi_receiver_delete(struct lifi_receiver *receiver);
+void lipi_receiver_delete(struct lipi_receiver *receiver);
 
-char lifi_receive_bit(struct lifi_receiver *receiver);
+char lipi_receive_bit(struct lipi_receiver *receiver);
 
-char lifi_receive_bits(struct lifi_receiver *receiver, size_t count);
+char lipi_receive_bits(struct lipi_receiver *receiver, size_t count);
 
-int lifi_receive(struct lifi_receiver *receiver, char *str, size_t count);
+int lipi_receive(struct lipi_receiver *receiver, char *str, size_t count);

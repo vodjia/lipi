@@ -21,22 +21,25 @@ int main(void)
 	const size_t code_length = 5;
 	const char start_code = 0x18;
 	const char end_code = 0x0D;
-	struct lifi_receiver *receiver = lifi_receiver_new(device,
-							   adc0820_read,
-							   period,
-							   threshold,
-							   code_length,
-							   start_code,
-							   end_code);
+	struct lipi_config config = {
+		.period = period,
+		.threshold = threshold,
+		.code_length = code_length,
+		.start_code = start_code,
+		.end_code = end_code
+	};
+	struct lipi_receiver *receiver = lipi_receiver_new(&config,
+							   device,
+							   adc0820_read);
 	for (;;) {
-		char code = lifi_receive_bit(receiver);
+		char code = lipi_receive_bit(receiver);
 		if (code == 1) {
 			code <<= code_length - 1;
-			code |= lifi_receive_bits(receiver, code_length - 1);
-			if (code == receiver->start_code) {
+			code |= lipi_receive_bits(receiver, code_length - 1);
+			if (code == start_code) {
 				char raw[BUFFER_CAPACITY] = { 0 };
 				size_t length = 
-					lifi_receive(receiver,
+					lipi_receive(receiver,
 						     raw,
 						     BUFFER_CAPACITY);
 				printf("Raw: [");
@@ -52,7 +55,7 @@ int main(void)
 			}
 		}
 	}
-	lifi_receiver_delete(receiver);
+	lipi_receiver_delete(receiver);
 	adc0820_delete(device);
 	gpiod_chip_close(chip);
 	return 0;
