@@ -1,8 +1,8 @@
+#include "adc0820.h"
+#include "decode.h"
+#include "receiver.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "adc0820.h"
-#include "receiver.h"
-#include "decode.h"
 
 #define BUFFER_CAPACITY 8192
 

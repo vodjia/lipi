@@ -1,5 +1,5 @@
-#ifndef TRANSMIT_H_
-#define TRANSMIT_H_
+#ifndef TRANSMIT_H
+#define TRANSMIT_H
 
 void wait();
 void send_char(unsigned char input, struct gpiod_line *light);
