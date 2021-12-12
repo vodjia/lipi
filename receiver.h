@@ -1,5 +1,4 @@
 #include "config.h"
-#include <stddef.h>
 
 struct lipi_receiver {
 	struct lipi_config *config;
