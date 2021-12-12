@@ -31,9 +31,10 @@ void lipi_transmit_bit(struct lipi_transmitter *transmitter, char bit)
 
 void lipi_transmit(struct lipi_transmitter *transmitter, char *str)
 {
+	size_t code_length = transmitter->config->code_length;
 	for (size_t i = 0; str[i] != '\0'; ++i) {
-		for (size_t j = 0; j < CHAR_BIT; ++j) {
-			char bit = str[j] >> (CHAR_BIT - j - 1);
+		for (size_t j = 0; j < code_length; ++j) {
+			char bit = (str[i] >> (code_length - j - 1)) & 1;
 			lipi_transmit_bit(transmitter, bit);
 		}
 	}
