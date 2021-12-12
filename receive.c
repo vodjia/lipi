@@ -28,9 +28,8 @@ int main(void)
 		.start_code = start_code,
 		.end_code = end_code
 	};
-	struct lipi_receiver *receiver = lipi_receiver_new(&config,
-							   device,
-							   adc0820_read);
+	struct lipi_receiver *receiver =
+		lipi_receiver_new(&config, device, adc0820_read);
 	for (;;) {
 		char code = lipi_receive_bit(receiver);
 		if (code == 1) {

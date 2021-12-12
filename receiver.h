@@ -1,3 +1,6 @@
+#ifndef RECEIVER_H
+#define RECEIVER_H
+
 #include "config.h"
 
 struct lipi_receiver {
@@ -17,3 +20,5 @@ char lipi_receive_bit(struct lipi_receiver *receiver);
 char lipi_receive_bits(struct lipi_receiver *receiver, size_t count);
 
 int lipi_receive(struct lipi_receiver *receiver, char *str, size_t count);
+
+#endif

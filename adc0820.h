@@ -1,3 +1,6 @@
+#ifndef ADC0820_H
+#define ADC0820_H
+
 #include <gpiod.h>
 
 struct adc0820_pinout {
@@ -47,3 +50,5 @@ struct adc0820_device *adc0820_new(struct gpiod_chip *chip,
 void adc0820_delete(struct adc0820_device *device);
 
 unsigned char adc0820_read(struct adc0820_device *device);
+
+#endif

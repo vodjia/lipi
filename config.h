@@ -1,3 +1,6 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
 #include <stddef.h>
 
 struct lipi_config {
@@ -7,3 +10,5 @@ struct lipi_config {
 	char start_code;
 	char end_code;
 };
+
+#endif
