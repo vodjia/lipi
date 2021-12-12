@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
 	if (argc < 2) {
-		perror("No input files.");
+		puts("No input files.");
 		return -1;
 	}
 	const char chipname[] = "gpiochip0";
