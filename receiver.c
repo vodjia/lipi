@@ -24,7 +24,7 @@ char lipi_receive_bit(struct lipi_receiver *receiver)
 	struct lipi_config *config = receiver->config;
 	struct timeval current;
 	gettimeofday(&current, NULL);
-	usleep(config->period - current.tv_usec % config->period);
+	usleep(1.25 * config->period - current.tv_usec % config->period);
 	if (receiver->read(receiver->device) > config->threshold)
 		return 1;
 	return 0;

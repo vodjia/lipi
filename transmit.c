@@ -3,13 +3,43 @@
 #include "transmitter.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#define BUFFER_CAPACITY 1024
+
+void transmit(struct lipi_transmitter *transmitter,
+	      const char *str,
+	      size_t count)
+{
+	size_t length = 2 * count + 2;
+	char *buffer = malloc(length);
+	encode4b5b(buffer + 1, str, count);
+	buffer[0] = transmitter->config->start_code;
+	buffer[length - 1] = transmitter->config->end_code;
+	lipi_transmit(transmitter, buffer, length);
+	free(buffer);
+}
+
+void transmit_file(struct lipi_transmitter *transmitter, const char *filename)
+{
+	FILE *file = fopen(filename, "r");
+	if (file == NULL) {
+		perror("No such file or directory.");
+		printf("Skipping %s.", filename);
+		return;
+	}
+	fseek(file, 0, SEEK_END);
+	size_t length = ftell(file);
+	fseek(file, 0, SEEK_SET);
+	char *buffer = malloc(length);
+	fread(buffer, length, 1, file);
+	fclose(file);
+	transmit(transmitter, buffer, length);
+	free(buffer);
+}
 
 int main(int argc, char *argv[])
 {
-	if (argc < 2) {
-		puts("No input files.");
-		return -1;
-	}
 	const char chipname[] = "gpiochip0";
 	struct gpiod_chip *chip = gpiod_chip_open_by_name(chipname);
 	const int pin = 18;
@@ -28,28 +58,15 @@ int main(int argc, char *argv[])
 	};
 	struct lipi_transmitter *transmitter =
 		lipi_transmitter_new(&config, device, led_write);
-	for (size_t i = 1; i < argc; ++i) {
-		FILE *file = fopen(argv[i], "r");
-		if (file == NULL) {
-			perror("No such file or directory.");
-			printf("Skipping %s.", argv[i]);
-			continue;
+	if (argc > 1) {
+		for (size_t i = 1; i < argc; ++i)
+			transmit_file(transmitter, argv[i]);
+	} else {
+		for (;;) {
+			char buffer[BUFFER_CAPACITY] = { 0 };
+			scanf("%s", buffer);
+			transmit(transmitter, buffer, strlen(buffer));
 		}
-		fseek(file, 0, SEEK_END);
-		size_t file_length = ftell(file);
-		fseek(file, 0, SEEK_SET);
-		size_t message_length = file_length;
-		char *message = malloc(message_length);
-		fread(message, file_length, 1, file);
-		fclose(file);
-		size_t encoded_length = 2 * message_length + 2;
-		char *encoded = malloc(encoded_length);
-		encode4b5b(encoded + 1, message, message_length);
-		free(message);
-		encoded[0] = start_code;
-		encoded[encoded_length - 1] = end_code;
-		lipi_transmit(transmitter, encoded, encoded_length);
-		free(encoded);
 	}
 	lipi_transmitter_delete(transmitter);
 	led_delete(device);

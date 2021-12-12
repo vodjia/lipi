@@ -17,7 +17,7 @@ int main(void)
 	};
 	struct adc0820_device *device = adc0820_new(chip, &pinout);
 	const unsigned long period = 1000;
-	const unsigned long threshold = 120;
+	const unsigned long threshold = 110;
 	const size_t code_length = 5;
 	const char start_code = 0x06;
 	const char end_code = 0x0D;

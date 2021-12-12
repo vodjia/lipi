@@ -25,12 +25,14 @@ int decode4b5b(char *dest, const char *src)
 	size_t i = 0;
 	while (src[i] != '\0') {
 		char data = lookup[(unsigned)src[i]];
+		if (data == 0x0 && src[i] != 0x1E)
+			data = 0x6;
 		if (i & 1)
 			dest[i / 2] |= data;
 		else
 			dest[i / 2] = data << CHAR_BIT / 2;
-		if (data == 0x0 && src[i] != 0x1E)
-			return -i;
+		// if (data == 0x0 && src[i] != 0x1E)
+		// 	return -i;
 		++i;
 	}
 	dest[i] = '\0';
