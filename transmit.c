@@ -6,6 +6,10 @@
 
 int main(int argc, char *argv[])
 {
+	if (argc < 2) {
+		perror("No input files.");
+		return -1;
+	}
 	const char chipname[] = "gpiochip0";
 	struct gpiod_chip *chip = gpiod_chip_open_by_name(chipname);
 	const int pin = 18;
@@ -24,6 +28,21 @@ int main(int argc, char *argv[])
 	};
 	struct lipi_transmitter *transmitter =
 		lipi_transmitter_new(&config, device, led_write);
+	for (size_t i = 1; i < argc; ++i) {
+		FILE *file = fopen(argv[i], "r");
+		if (file == NULL) {
+			perror("No such file or directory.");
+			printf("Skipping %s.", argv[i]);
+			continue;
+		}
+		fseek(file, 0, SEEK_END);
+		size_t file_length = ftell(file);
+		fseek(file, 0, SEEK_SET);
+		char *buffer = malloc(file_length + 1);
+		fread(buffer, file_length, 1, file);
+		fclose(file);
+		lipi_transmit(transmitter, buffer);
+	}
 	lipi_transmitter_delete(transmitter);
 	led_delete(device);
 	gpiod_chip_close(chip);
