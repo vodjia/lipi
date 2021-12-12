@@ -33,5 +33,6 @@ int decode4b5b(char *dest, const char *src)
 			return -i;
 		++i;
 	}
+	dest[i] = '\0';
 	return i;
 }
