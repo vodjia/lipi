@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 	const unsigned long period = 1000;
 	const unsigned long threshold = 120;
 	const size_t code_length = 5;
-	const char start_code = 0x18;
+	const char start_code = 0x06;
 	const char end_code = 0x0D;
 	struct lipi_config config = {
 		.period = period,
