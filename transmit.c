@@ -38,9 +38,13 @@ int main(int argc, char *argv[])
 		fseek(file, 0, SEEK_END);
 		size_t file_length = ftell(file);
 		fseek(file, 0, SEEK_SET);
-		char *buffer = malloc(file_length + 1);
-		fread(buffer, file_length, 1, file);
+		size_t buffer_length = file_length + 3;
+		char *buffer = malloc(buffer_length);
+		fread(buffer + 1, file_length, 1, file);
 		fclose(file);
+		buffer[0] = start_code;
+		buffer[buffer_length - 1] = end_code;
+		buffer[buffer_length] = '\0';
 		lipi_transmit(transmitter, buffer);
 	}
 	lipi_transmitter_delete(transmitter);
