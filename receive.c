@@ -51,6 +51,12 @@ int main(void)
 					printf("Error at index: %d\n", -ret);
 				else
 					printf("Data: %s\n", data);
+				FILE *file = fopen("received.txt", "w");
+				if (fputs(data, file) == EOF) {
+					perror("Failed to write.");
+					return -1;
+				}
+				fclose(file);
 			}
 		}
 	}
