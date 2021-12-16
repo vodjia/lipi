@@ -10,7 +10,7 @@ TRANSMIT_SRCS = transmit.c encode.c transmitter.c led.c
 .PHONY: all receive transmit
 
 all: $(TARGETS)
-	
+
 receive:
 	$(CC) $(CPPFLAGS) $(CFALGS) $(RECEIVE_SRCS) $(LDFLAGS) -o receive
 

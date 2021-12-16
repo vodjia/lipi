@@ -44,8 +44,8 @@ int main(int argc, char *argv[])
 	struct gpiod_chip *chip = gpiod_chip_open_by_name(chipname);
 	const int pin = 18;
 	struct led_device *device = led_new(chip, pin);
-	const unsigned long period = 1000;
-	const unsigned long threshold = 120;
+	const unsigned long period = 8000;
+	const unsigned long threshold = 100;
 	const size_t code_length = 5;
 	const char start_code = 0x06;
 	const char end_code = 0x0D;

@@ -16,8 +16,8 @@ int main(void)
 		.db4 = 24, .db5 = 25, .db6 = 5, .db7 = 6, .ofl_n = 21
 	};
 	struct adc0820_device *device = adc0820_new(chip, &pinout);
-	const unsigned long period = 1000;
-	const unsigned long threshold = 110;
+	const unsigned long period = 8000;
+	const unsigned long threshold = 100;
 	const size_t code_length = 5;
 	const char start_code = 0x06;
 	const char end_code = 0x0D;
@@ -30,34 +30,43 @@ int main(void)
 	};
 	struct lipi_receiver *receiver =
 		lipi_receiver_new(&config, device, adc0820_read);
+#ifndef NDEBUG
+	size_t total_count = 0;
+	size_t error_count = 0;
+#endif
 	for (;;) {
 		char code = lipi_receive_bit(receiver);
 		if (code == start_code >> (code_length - 1)) {
 			code <<= code_length - 1;
 			code |= lipi_receive_bits(receiver, code_length - 1);
 			if (code == start_code) {
+				++total_count;
 				char raw[BUFFER_CAPACITY] = { 0 };
 				size_t length = 
 					lipi_receive(receiver,
 						     raw,
 						     BUFFER_CAPACITY);
-				// printf("Raw: [");
-				// for (size_t i = 0; i < length; ++i)
-				// 	printf("%x, ", raw[i]);
-				// printf("]\n");
 				char data[BUFFER_CAPACITY] = { 0 };
-				int ret = decode4b5b(data, raw);
+				if (decode4b5b(data, raw) < 0) {
+#ifndef NDEBUG
+					++error_count;
+#endif
+				}
+#ifdef NDEBUG
 				printf("%s\n", data);
-				// if (ret < 0)
-				// 	printf("Error at index: %d\n", -ret);
-				// else
-				// 	printf("Data: %s\n", data);
+#endif
 				FILE *file = fopen("received.txt", "w");
 				if (fputs(data, file) == EOF) {
 					perror("Failed to write.");
 					return -1;
 				}
 				fclose(file);
+#ifndef NDEBUG
+				printf("________________\n");
+				printf("Total count: %d\n", total_count);
+				printf("Error count: %d\n", error_count);
+				printf("Error rate: %d%%\n", (double)error_count / total_count * 100);
+#endif
 			}
 		}
 	}
