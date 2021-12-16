@@ -65,7 +65,7 @@ int main(void)
 				printf("________________\n");
 				printf("Total count: %d\n", total_count);
 				printf("Error count: %d\n", error_count);
-				printf("Error rate: %d%%\n", (double)error_count / total_count * 100);
+				printf("Error rate: %lf%%\n", (double)error_count / total_count * 100);
 #endif
 			}
 		}
